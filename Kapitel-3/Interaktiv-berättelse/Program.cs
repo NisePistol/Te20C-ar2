@@ -6,6 +6,7 @@ namespace Interaktiv_berättelse
     {
         static void Main(string[] args)
         {
+
             // Rensar consolen
             Console.Clear();
 
@@ -241,7 +242,8 @@ namespace Interaktiv_berättelse
                         //slut på programmet
                     }
                 }   
-            }                    
+            }     
+            Console.ReadKey();               
         }
     }
 }
