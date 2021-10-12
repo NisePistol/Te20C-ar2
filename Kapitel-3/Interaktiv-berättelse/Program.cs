@@ -11,7 +11,7 @@ namespace Interaktiv_berättelse
             Console.Clear();
 
             // Frågar och tar in första valet från användaren
-            Console.Write("Väljer du att åka buss eller tåg till skolan? (buss/tåg)");
+            Console.Write("Väljer du att åka buss eller tåg till skolan? (buss/tåg) ");
             string transport = Console.ReadLine().ToLower();
             
             if (transport == "buss") 
@@ -242,8 +242,7 @@ namespace Interaktiv_berättelse
                         //slut på programmet
                     }
                 }   
-            }     
-            Console.ReadKey();               
+            }   
         }
     }
 }
