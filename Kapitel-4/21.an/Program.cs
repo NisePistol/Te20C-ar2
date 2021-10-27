@@ -7,11 +7,9 @@ namespace _21.an
         static void Main(string[] args)
         {
             Console.Clear();
+            string draKort = "j";
             int spelareSumma = 0;
             int datorSumma = 0;
-            int datorTal = 0;
-            string draKort = "j";
-            Random generator = new Random();
 
             Console.WriteLine("Blackjack\n------------");
 
@@ -23,6 +21,7 @@ namespace _21.an
                 Console.Clear();
                 Console.WriteLine("Blackjack\n------------");
 
+                Random generator = new Random();
                 //slumpar spelarens tal
                 int spelareTal = generator.Next(1, 11);
 
@@ -37,7 +36,7 @@ namespace _21.an
                 Console.WriteLine($"Du har totalt: {spelareSumma}");
 
                 //slumpar datorns tal
-                datorTal = generator.Next(1, 11);
+                int datorTal = generator.Next(1, 11);
 
                 //Adderar talet datorn fick till datorns summa
                 datorSumma += datorTal;
@@ -48,14 +47,14 @@ namespace _21.an
 
                 //Skriver ut summan
                 Console.WriteLine($"Datorn har totalt: {datorSumma}");
-                
+
                 Console.ForegroundColor = ConsoleColor.White;
                 //Om spelaren går över 21
                 if (spelareSumma >= 21)
                 {
                     Console.WriteLine("----------\nDu förlora!");
                     break;
-                } 
+                }
                 //Om datorn går över 21
                 else if (datorSumma >= 21)
                 {
