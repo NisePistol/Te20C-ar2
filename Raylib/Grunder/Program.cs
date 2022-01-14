@@ -7,19 +7,26 @@ namespace Grunder
     {
         static void Main(string[] args)
         {
-            int width = 800;
+            int width = 1000;
             int height = 600;
             string title = "Minecraft";
 
-            int ballPosX = width / 2;
-            int ballPosY = height / 2;
-            int ballSpeed = 5;
-            int rad = 15;
+            int ballStartPosX = width / 2;
+            int ballStartPosY = height / 2;
+            int ballPosX = ballStartPosX;
+            int ballPosY = ballStartPosY;
+            int rad = 10;
+            int ballSpeedX = 6;
+            int ballSpeedY = 6;
 
-            Random gen = new Random();
-            int fiendeRad = gen.Next(30, 50);
-            int fiendePosX = gen.Next(fiendeRad, width - fiendeRad);
-            int fiendePosY = gen.Next(fiendeRad, height - fiendeRad);
+            int recW = 20;
+            int recH = 100;
+            int recPosX = width / 5;
+            int recPosY = height / 2 - (recH / 2);
+            int recSpeed = 15;
+
+            int rec2PosX = width/2+width/4;
+            int rec2PosY = recPosY;
 
             //Starta ett fönster
             Raylib.InitWindow(width, height, title);
@@ -27,8 +34,10 @@ namespace Grunder
             //Ställ in FPS
             Raylib.SetTargetFPS(60);
 
+
             while (!Raylib.WindowShouldClose())
             {
+                
                 //Börja rita
                 Raylib.BeginDrawing();
 
@@ -38,70 +47,84 @@ namespace Grunder
                 //RITA SPELARE
                 Raylib.DrawCircle(ballPosX, ballPosY, rad, Color.BROWN);
 
+                Raylib.DrawRectangle(recPosX, recPosY, recW, recH, Color.BLUE);
+                Raylib.DrawRectangle(rec2PosX, rec2PosY, recW, recH, Color.RED);
+
+                ballPosX += ballSpeedX * -1;
+                ballPosY += ballSpeedY;
+
+                //ÅK INTE UTANFÖR SKÄRMEN
+                if (ballPosX + rad > width)
+                {
+                    ballPosX = ballStartPosX;
+                    ballPosY = ballStartPosY;
+                    ballSpeedX = 6;
+                }
+                else if (ballPosX - rad <= 0)
+                {
+                    ballPosX = ballStartPosX;
+                    ballPosY = ballStartPosY;
+                }
+                else if (ballPosY + rad >= height)
+                {
+                    ballSpeedY *= -1;
+                }
+                else if (ballPosY - rad <= 0)
+                {
+                    ballSpeedY *= -1;
+                }
+
+
                 //KONTROLL
-                if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT))
+                if (Raylib.IsKeyDown(KeyboardKey.KEY_W))
                 {
-                    ballPosX += ballSpeed;
+                    recPosY -= recSpeed;
                 }
-                else if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT))
+                else if (Raylib.IsKeyDown(KeyboardKey.KEY_S))
                 {
-                    ballPosX -= ballSpeed;
+                    recPosY += recSpeed;
                 }
+                //KONTROLL
                 if (Raylib.IsKeyDown(KeyboardKey.KEY_UP))
                 {
-                    ballPosY -= ballSpeed;
+                    rec2PosY -= recSpeed;
                 }
                 else if (Raylib.IsKeyDown(KeyboardKey.KEY_DOWN))
                 {
-                    ballPosY += ballSpeed;
+                    rec2PosY += recSpeed;
                 }
 
-                //ÅK INTE UTANFÖR SKÄRMEN
-                if (ballPosX - rad > width)
+                //Kollision med kanter för rektangel
+                if (recPosY + recH >= height)
                 {
-                    ballPosX = rad * -1;
+                    recPosY = height - recH;
                 }
-                else if (ballPosX + rad < 0)
+                else if (recPosY <= 0)
                 {
-                    ballPosX = width + rad;
+                    recPosY = 0;
                 }
-                else if (ballPosY - rad > height)
+                //Kollision med kanter för rektangel
+                if (rec2PosY + recH >= height)
                 {
-                    ballPosY = rad * -1;
+                    rec2PosY = height - recH;
                 }
-                else if (ballPosY + rad < 0)
+                else if (rec2PosY <= 0)
                 {
-                    ballPosY = height + rad;
+                    rec2PosY = 0;
                 }
 
-                //FIENDE
-                Fiende måns = new Fiende(fiendeRad, fiendePosX, fiendePosY);
-
-                
-
+                //Kollision med boll och rektangel
+                if (ballPosX - rad < recPosX + recW && ballPosY >= recPosY && ballPosY <= recPosY + recH && ballPosX-rad !> recPosX)
+                {
+                    ballSpeedX*=-1;
+                }
+                if (ballPosX + rad > rec2PosX && ballPosY >= rec2PosY && ballPosY <= rec2PosY + recH && ballPosX+rad !< rec2PosX+recW)
+                {
+                    ballSpeedX*=-1;
+                }
                 //Avslutar ritningen
                 Raylib.EndDrawing();
             }
-        }
-    }
-
-    class Fiende
-    {
-        Random gen = new Random();
-        int fiendeRad;
-        int fiendePosX;
-        int fiendePosY;
-
-        public Fiende(int _fiendeRad, int _fiendePosX, int _fiendePosY)
-        {
-            int fiendeRad = _fiendeRad;
-            int fiendePosX = _fiendePosX;
-            int fiendePosY = _fiendePosY;
-        }
-
-        void RitaFiende()
-        {
-            Raylib.DrawCircle(fiendePosX, fiendePosY, fiendeRad, Color.BLACK);
         }
     }
 }
