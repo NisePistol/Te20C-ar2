@@ -28,7 +28,7 @@ namespace Grunder
 
         static int winTxtPosX;
         static int winTxtPosY;
-        static int grej = width-500;
+        static int border = width-500;
 
         static void Main(string[] args)
         {
@@ -202,15 +202,15 @@ namespace Grunder
                 winner = "Röd";
             }
             
-            if (winTxtPosX < grej)
+            if (winTxtPosX < border)
             {
                 winTxtPosX += 5;
-                grej = width-500;
+                border = width-500;
             }
             else 
             {
                 winTxtPosX -= 5;
-                grej = 100;
+                border = 100;
             }
             Raylib.DrawText($"{winner} vann!", winTxtPosX, winTxtPosY, width / 10, Color.PINK);
             Raylib.DrawText($"Spela igen?", width/3, height/2, width / 15, Color.GOLD);
@@ -218,8 +218,7 @@ namespace Grunder
             int buttonW = width/4;
             int buttonH = height/6;
             Raylib.DrawRectangle(width/2-(buttonW/2), height-(buttonH+buttonH/2), buttonW, buttonH, Color.RAYWHITE);
-            Raylib.DrawText("JA", width/2, height-(buttonH+buttonH/2), 40, Color.BLACK);
-            
+            Raylib.DrawText("JA", width/2-55, height-(buttonH+buttonH/2)+4, 100, Color.BLACK);
         }
     }
 }
