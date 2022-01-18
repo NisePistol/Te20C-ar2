@@ -26,10 +26,17 @@ namespace Grunder
         static int blåPoäng;
         static int rödPoäng;
 
+        static int winTxtPosX;
+        static int winTxtPosY;
+        static int grej = width-500;
+
         static void Main(string[] args)
         {
             int ballStartPosX = width / 2;
             int ballStartPosY = height / 2;
+
+            winTxtPosY = height/9;
+            winTxtPosX = width/2-width/4;
 
             ballPosX = ballStartPosX;
             ballPosY = ballStartPosY;
@@ -46,8 +53,10 @@ namespace Grunder
             rec2PosX = width / 2 + width / 5;
             rec2PosY = recPosY;
 
-            blåPoäng = 0;
+            blåPoäng = 5;
             rödPoäng = 0;
+
+            Texture2D nisse = Raylib.LoadTexture(@"./Resurser/Nisse");
 
             //Starta ett fönster
             Raylib.InitWindow(width, height, title);
@@ -113,7 +122,6 @@ namespace Grunder
                     rec2PosY += recSpeed;
                 }
 
-               
                 //Kollision med kanter för rektangel
                 if (recPosY + recH >= height)
                 {
@@ -143,6 +151,11 @@ namespace Grunder
                     ballSpeedX *= -1;
                 }
 
+                if (blåPoäng >= 5 || rödPoäng >= 5)
+                {
+                    EndScreen();
+                }
+
                 //Avslutar ritningen
                 Raylib.EndDrawing();
             }
@@ -157,20 +170,55 @@ namespace Grunder
         static void RitaFormer()
         {
             //RITA Bollen
-            Raylib.DrawCircle(ballPosX, ballPosY, ballRad, Color.BROWN);
+            if (blåPoäng < 5 && rödPoäng < 5)
+            {
+                Raylib.DrawCircle(ballPosX, ballPosY, ballRad, Color.BROWN);
 
-            //Rita spelarna
-            Raylib.DrawRectangle(recPosX, recPosY, recW, recH, Color.BLUE);
-            Raylib.DrawRectangle(rec2PosX, rec2PosY, recW, recH, Color.RED);
+                //Rita spelarna
+                Raylib.DrawRectangle(recPosX, recPosY, recW, recH, Color.BLUE);
+                Raylib.DrawRectangle(rec2PosX, rec2PosY, recW, recH, Color.RED);
 
-            //Rita poäng texten
-            Raylib.DrawText($"Poäng: {blåPoäng}", width / 2 - width / 3, 10, width / 27, Color.BLUE);
-            Raylib.DrawText($"Poäng: {rödPoäng}", width / 2 + width / 5, 10, width / 27, Color.RED);
+                //Rita poäng texten
+                Raylib.DrawText($"Poäng: {blåPoäng}", width / 2 - width / 3, 10, width / 27, Color.BLUE);
+                Raylib.DrawText($"Poäng: {rödPoäng}", width / 2 + width / 5, 10, width / 27, Color.RED);
+            }
+            else
+            {
+                Raylib.ClearBackground(Color.BEIGE);
+            }
         }
 
-        static void Kollision(int posY)
+        static void EndScreen()
         {
+            string winner = "";
+            ballSpeedX = 0;
+            ballSpeedY = 0;
+            if (blåPoäng == 5)
+            {
+                winner = "Blå";
+            }
+            else if (rödPoäng == 5)
+            {
+                winner = "Röd";
+            }
             
+            if (winTxtPosX < grej)
+            {
+                winTxtPosX += 5;
+                grej = width-500;
+            }
+            else 
+            {
+                winTxtPosX -= 5;
+                grej = 100;
+            }
+            Raylib.DrawText($"{winner} vann!", winTxtPosX, winTxtPosY, width / 10, Color.PINK);
+            Raylib.DrawText($"Spela igen?", width/3, height/2, width / 15, Color.GOLD);
+
+            int buttonW = width/4;
+            int buttonH = height/6;
+            Raylib.DrawRectangle(width/2-(buttonW/2), height-(buttonH+buttonH/2), buttonW, buttonH, Color.RAYWHITE);
+            Raylib.DrawText("JA", width/2, height-(buttonH+buttonH/2), 40, Color.BLACK);
             
         }
     }
