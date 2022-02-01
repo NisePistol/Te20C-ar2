@@ -1,0 +1,8 @@
+En metod eller klass för knappar
+
+klicka före man startar + overlay
+
+powers: 
+-mer tid att träffa
+-snabbare hastighet
+-större hitbox
