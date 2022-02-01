@@ -1,67 +1,55 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Raylib_cs;
 
 namespace Pong
 {
     class Program
     {
-        static int ballPosX;
-        static int ballPosY;
-        static int ballSpeedY;
-        static int ballSpeedX;
-        static int ballRad;
-
-        static int ballStartPosX;
-        static int ballStartPosY;
-
         static int screenWidth = 1200;
         static int screenHeight = 600;
         static string title = "Pong";
 
-        static int blueScore;
-        static int redScore;
+        static int ballStartPosX = screenWidth / 2;
+        static int ballStartPosY = screenHeight / 2;
 
-        static int winTxtPosX;
-        static int winTxtPosY;
+        static int ballPosX = ballStartPosX;
+        static int ballPosY = ballStartPosY;
+
+        static int ballSpeedX = -6;
+        static int ballSpeedY = 6;
+        static int ballRad = 10;
+
+        static int blueScore = 0;
+        static int redScore = 0;
+
+        static int winTxtPosX = screenWidth / 2 - screenWidth / 4;
+        static int winTxtPosY = screenHeight / 9;
         static int border = screenWidth - 500;
 
         static int mouseX;
         static int mouseY;
 
-        static bool startGame = false;
+        static int scen = 0;
 
         static int flag = 0;
 
         static Random generator = new Random();
 
+        static string name1;
+        static string name2;
+        static int nameX = screenWidth/2-20;
+        static int nameSize = 75;
+
         static void Main(string[] args)
         {
-            ballStartPosX = screenWidth / 2;
-            ballStartPosY = screenHeight / 2;
-
-            winTxtPosY = screenHeight / 9;
-            winTxtPosX = screenWidth / 2 - screenWidth / 4;
-
-            ballPosX = ballStartPosX;
-            ballPosY = ballStartPosY;
-            ballRad = 10;
-
-            ballSpeedX = -6;
-            ballSpeedY = 6;
-
             //slumpar om bollen åker upp eller ner i början
             int flag = generator.Next(2);
             if (flag == 1)
             {
                 ballSpeedY *= -1;
             }
-            else
-            {
-                ballSpeedY *= 1;
-            }
-
-            blueScore = 0;
-            redScore = 0;
 
             //Starta ett fönster
             Raylib.InitWindow(screenWidth, screenHeight, title);
@@ -78,14 +66,20 @@ namespace Pong
                 Raylib.ClearBackground(Color.BEIGE);
 
                 //Kör endast "StartScreen" en gång
-                if (!startGame)
+                if (scen == 0)
                 {
-                    startGame = StartScreen();
+                    StartScreen();
+                }
+
+                if (scen == 1)
+                {
+                    NameScreen();
                 }
 
                 //Vätar på return värdet för att börja rita spelet
-                if (startGame)
+                if (scen == 2)
                 {
+                    
                     if (blueScore < 5 && redScore < 5)
                     {
                         Player.DrawPlayer();
@@ -108,6 +102,13 @@ namespace Pong
                 //Avslutar ritningen
                 Raylib.EndDrawing();
             }
+        }
+
+        static void NameScreen()
+        {
+            Raylib.DrawText("ENTER NAME", screenWidth/3-35, 20, 75, Color.RAYWHITE);
+            Raylib.DrawText(name1, nameX, 100, nameSize, Color.BLUE);
+            NameList();
         }
 
         static void BallPlayerCollision(int recPosX, int recPosY, int rec2PosX, int rec2PosY, int recW, int recH)
@@ -150,7 +151,7 @@ namespace Pong
             }
         }
 
-        static bool StartScreen()
+        static void StartScreen()
         {
             Raylib.ClearBackground(Color.BEIGE);
 
@@ -177,8 +178,6 @@ namespace Pong
 
             DrawBackground();
 
-            bool startGame = false;
-
             //Om man hooverar över play knappen
             if (mouseX > playButtonX && mouseX < playButtonX + playButtonW && mouseY > playButtonY && mouseY < playButtonY + playButtonH || Raylib.IsKeyDown(KeyboardKey.KEY_UP))
             {
@@ -187,7 +186,7 @@ namespace Pong
             //Om man trycker på play knappen
             if (mouseX > playButtonX && mouseX < playButtonX + playButtonW && mouseY > playButtonY && mouseY < playButtonY + playButtonH && Raylib.IsMouseButtonDown(MouseButton.MOUSE_LEFT_BUTTON))
             {
-                startGame = true;
+                scen = 1;
             }
 
             //Om man hovverar över power knappen
@@ -195,7 +194,7 @@ namespace Pong
             {
                 pwColor = Color.GRAY;
             }
-            //Om man trycker på hoover knappen
+            //Om man trycker på power knappen
             if (mouseX > pwButtonX && mouseX < pwButtonX + pwButtonW && mouseY > pwButtonY && mouseY < pwButtonY + pwButtonH && Raylib.IsMouseButtonDown(MouseButton.MOUSE_LEFT_BUTTON))
             {
                 //PowerScreen();
@@ -206,8 +205,6 @@ namespace Pong
 
             Raylib.DrawText("PLAY", playX, playY, screenWidth / 6, Color.RAYWHITE);
             Raylib.DrawText("POWERS", pwX, pwY, screenWidth / 6, Color.RAYWHITE);
-
-            return startGame;
         }
 
         static void DrawBackground()
@@ -267,19 +264,19 @@ namespace Pong
 
             if (blueScore == 5)
             {
-                winner = "Blå";
+                winner = "BLUE";
             }
             else
             {
-                winner = "Röd";
+                winner = "RED";
             }
 
             AnimateText();
 
             //Skriver ut vem som vann
-            Raylib.DrawText($"{winner} vann!", winTxtPosX, winTxtPosY, screenWidth / 10, Color.PINK);
+            Raylib.DrawText($"{winner} WON!", winTxtPosX, winTxtPosY, screenWidth / 10, Color.BROWN);
             //Skriver ut "spela igen?"
-            Raylib.DrawText($"Spela igen?", screenWidth / 3, screenHeight / 2, screenWidth / 15, Color.GOLD);
+            Raylib.DrawText($"PLAY AGAIN?", screenWidth / 3, screenHeight / 2, screenWidth / 15, Color.GOLD);
 
             int buttonW = screenWidth / 4;
             int buttonH = screenHeight / 6;
@@ -322,7 +319,7 @@ namespace Pong
                 ballSpeedX = 6;
                 ballSpeedY = 6;
 
-                startGame = false;
+                scen = 0;
             }
 
             //Ritar knappen
@@ -346,6 +343,152 @@ namespace Pong
             {
                 winTxtPosX -= 5;
                 border = screenWidth / 10;
+            }
+        }
+
+        static void NameList()
+        {
+            int decrement = 15;
+            if(Raylib.IsKeyPressed(KeyboardKey.KEY_A))
+            {
+                name1 += "A";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_B))
+            {
+                name1 += "B";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_C))
+            {
+                name1 += "C";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_D))
+            {
+                name1 += "D";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_E))
+            {
+                name1 += "E";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_F))
+            {
+                name1 += "F";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_G))
+            {
+                name1 += "G";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_H))
+            {
+                name1 += "H";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_I))
+            {
+                name1 += "I";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_J))
+            {
+                name1 += "J";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_K))
+            {
+                name1 += "K";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_L))
+            {
+                name1 += "L";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_M))
+            {
+                name1 += "M";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_N))
+            {
+                name1 += "N";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_O))
+            {
+                name1 += "O";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_P))
+            {
+                name1 += "P";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_Q))
+            {
+                name1 += "Q";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_R))
+            {
+                name1 += "R";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_S))
+            {
+                name1 += "S";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_T))
+            {
+                name1 += "T";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_U))
+            {
+                name1 += "U";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_V))
+            {
+                name1 += "V";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_W))
+            {
+                name1 += "W";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_X))
+            {
+                name1 += "X";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_Y))
+            {
+                name1 += "Y";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_Z))
+            {
+                name1 += "Z";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_SPACE))
+            {
+                name1 += " ";
+                nameX-=decrement;
+            }
+            else if(Raylib.IsKeyPressed(KeyboardKey.KEY_BACKSPACE))
+            {
+                
+                nameX+=decrement;
+                //adrian
             }
         }
     }
