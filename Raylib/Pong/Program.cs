@@ -29,16 +29,18 @@ namespace Pong
         static int mouseX;
         static int mouseY;
 
-        static int scen = 1;
+        static int scen = 0;
 
         static bool flag = true;
 
         static Random generator = new Random();
 
+        static float sek = 3;
+
         static string name1;
         static string name2;
         static Color nameColor = Color.BLUE;
-        static int nameX = screenWidth / 2 - 20;
+        static int nameX = screenWidth / 2 - 25;
         static int nameSize = 75;
 
         static void Main(string[] args)
@@ -98,33 +100,39 @@ namespace Pong
 
         static void NameScreen()
         {
-            int decrement = 15;
             Raylib.DrawText("ENTER NAME", screenWidth / 3 - 50, 20, 75, Color.RAYWHITE);
+            Raylib.DrawText($" {sek} ", screenWidth / 2, 300, 75, Color.RAYWHITE);
+
+            //Om spelare 1 väljer namn
             if (flag)
             {
+                //Lägger till en bokstav och ritar ut det
                 name1 += WriteNameText(name1);
+
+                if (name1.Length > 0)
+                {
+                    //Om man klickar på backspace eller skriver in fler än 6 bokstäver
+                    if (Raylib.IsKeyPressed(KeyboardKey.KEY_BACKSPACE) || name1.Length > 6)
+                    {
+                        //Raderar den senaste bokstaven i "name1"
+                        name1 = RemoveLetter(name1);
+                    }
+                }
             }
+            //Om spelare 2 väljer namn
             else
             {
+                //Lägger till en bokstav och ritar ut det
                 name2 += WriteNameText(name2);
-            }
 
-            //Om man klickar på backspace 
-            if (Raylib.IsKeyPressed(KeyboardKey.KEY_BACKSPACE))
-            {
-                //Om spelare 1 håller på att skriva in sitt namn
-                if (name1.Length > 0 && flag)
+                if (name2.Length > 0)
                 {
-                    //Raderar den senaste bokstaven i "name1"
-                    name1 = name1.Remove(name1.Length - 1);
-                    nameX += decrement;
-                }
-                //Om spelare två håller på att skriva in sitt namn
-                else if (name2.Length > 0 && !flag)
-                {
-                    //Raderar den senaste bokstaven i "name1"
-                    name2 = name2.Remove(name2.Length - 1);
-                    nameX += decrement;
+                    //Om man klickar på backspace eller skriver in fler än 6 bokstäver
+                    if (Raylib.IsKeyPressed(KeyboardKey.KEY_BACKSPACE) || name2.Length > 6)
+                    {
+                        //Raderar den senaste bokstaven i "name2"
+                        name2 = RemoveLetter(name2);
+                    }
                 }
             }
 
@@ -133,8 +141,11 @@ namespace Pong
             {
                 //Ändrar boolens värde så att spelare 2 kan välja namn
                 flag = false;
+
                 //Ändrar färgen
                 nameColor = Color.RED;
+                
+                //Återställer name positionen
                 nameX = screenWidth / 2 - 20;
             }
             //När spelare 2 har valt sitt namn
@@ -149,6 +160,13 @@ namespace Pong
         {
             Raylib.DrawText(name, nameX, 100, nameSize, nameColor);
             return AddLetter();
+        }
+        static string RemoveLetter(string name)
+        {
+            //Raderar den senaste bokstaven i "name1"
+            name = name.Remove(name.Length - 1);
+            nameX += 15;
+            return name;
         }
 
         static void BallPlayerCollision(int recPosX, int recPosY, int rec2PosX, int rec2PosY, int recW, int recH)
@@ -306,6 +324,7 @@ namespace Pong
 
                 //Rita bollen
                 Raylib.DrawCircle(ballPosX, ballPosY, ballRad, Color.BROWN);
+                Raylib.DrawRectangle(ballPosX, ballPosY, ballRad*2, ballRad*2, Color.BROWN);
             }
             else
             {
@@ -388,7 +407,7 @@ namespace Pong
 
                 //Sätter tillbaka flag till true så att spelare 1 får välja namn först
                 flag = true;
-                
+
                 //Sätter på första scenen
                 scen = 0;
             }
