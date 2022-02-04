@@ -145,17 +145,6 @@ namespace MatProgram
             return i;
         }
 
-        static void AdderaVärdenOchSkrivUt(double _kcal, double _fett, double _protein, double gram)
-        {
-            //Adderar ingrediensens värden till maträttens summa
-            kcal += _kcal;
-            fett += _fett;
-            protein += _protein;
-
-            //Skriver ut ingrediensens innehåll
-            Console.WriteLine($"{gram}g {ingrediens} innehåller {_kcal}kcal, {_fett}g mättat fett och {_protein}g protein.");
-        }
-
         static int FrågaHurMånga(string enhet)
         {
             //Frågar hur mycket ml eller gram man har av ingrediensen
@@ -169,6 +158,17 @@ namespace MatProgram
             ingrediensKcal = enhet * förKcal;
             ingrediensFett = enhet * förFett;
             ingrediensProtein = enhet * förProtein;
+        }
+
+        static void AdderaVärdenOchSkrivUt(double _kcal, double _fett, double _protein, double enhet)
+        {
+            //Adderar ingrediensens värden till maträttens summa
+            kcal += _kcal;
+            fett += _fett;
+            protein += _protein;
+
+            //Skriver ut ingrediensens innehåll
+            Console.WriteLine($"{enhet}g {ingrediens} innehåller {_kcal}kcal, {_fett}g mättat fett och {_protein}g protein.");
         }
     }
 }
