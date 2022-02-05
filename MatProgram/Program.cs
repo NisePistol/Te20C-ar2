@@ -26,6 +26,15 @@ namespace MatProgram
                 Console.Write($"Skriv ingrediens {i + 1}: ");
                 ingrediens = Console.ReadLine().ToLower();
                 i += IngrediensLista();
+
+                Console.WriteLine("Vill du lägga till ingredienser? (j/n)");
+                string jaNej = Console.ReadLine().ToLower();
+                
+                if (jaNej == "j")
+                {
+                    Console.WriteLine("Hur många fler ingredienser vill du lägga till? ");
+                    i += int.Parse(Console.ReadLine());
+                }
             }
 
             Console.WriteLine($"Hela din maträtt innehåller {(int)kcal}kcal, {(int)fett}g mättat fett och {(int)protein}g protein.");
@@ -135,6 +144,65 @@ namespace MatProgram
                 //Adderar ingrediensens värden till maträttens summa och skriver ut ingrediensens innehåll
                 AdderaVärdenOchSkrivUt(ingrediensKcal, ingrediensFett, ingrediensProtein, enhet);
             }
+            else if (ingrediens == "bärmusli")
+            {
+                //Frågar hur mycket av ingrediensen man har
+                enhet = FrågaHurMånga("gram");
+
+                //Räknar ut hur mycket kcal, fett och protein ingrediensen innehåller
+                Uträkning(enhet, 3.6, 0.007, 0.095);
+
+                //Adderar ingrediensens värden till maträttens summa och skriver ut ingrediensens innehåll
+                AdderaVärdenOchSkrivUt(ingrediensKcal, ingrediensFett, ingrediensProtein, enhet);
+            }
+            else if (ingrediens == "smör")
+            {
+                //Frågar hur mycket av ingrediensen man har
+                enhet = FrågaHurMånga("gram");
+
+                while (true)
+                {
+                    Console.WriteLine("Bregott, eller becel?");
+                    string vilketSmör = Console.ReadLine().ToLower();
+
+                    if (vilketSmör == "bregott")
+                    {
+                        //Räknar ut hur mycket kcal, fett och protein ingrediensen innehåller
+                        Uträkning(enhet, 6.33, 0.3, 0.003);
+                        break;
+                    }
+                    else if (vilketSmör == "becel")
+                    {
+                        //Räknar ut hur mycket kcal, fett och protein ingrediensen innehåller
+                        Uträkning(enhet, 3.4, 0.087, 0);
+                        break;
+                    }
+                }
+
+                //Adderar ingrediensens värden till maträttens summa och skriver ut ingrediensens innehåll
+                AdderaVärdenOchSkrivUt(ingrediensKcal, ingrediensFett, ingrediensProtein, enhet);
+            }
+            else if (ingrediens == "vittbröd")
+            {
+                //Frågar hur mycket av ingrediensen man har
+                enhet = FrågaHurMånga("gram");
+
+                //Räknar ut hur mycket kcal, fett och protein ingrediensen innehåller
+                Uträkning(enhet, 2.6, 0.005, 0.088);
+
+                //Adderar ingrediensens värden till maträttens summa och skriver ut ingrediensens innehåll
+                AdderaVärdenOchSkrivUt(ingrediensKcal, ingrediensFett, ingrediensProtein, enhet);
+            }
+            else if (ingrediens == "äpple")
+            {
+                //Frågar hur mycket av ingrediensen man har
+                enhet = FrågaHurMånga("gram");
+
+                //Räknar ut hur mycket kcal, fett och protein ingrediensen innehåller
+
+                //Adderar ingrediensens värden till maträttens summa och skriver ut ingrediensens innehåll
+                AdderaVärdenOchSkrivUt(ingrediensKcal, ingrediensFett, ingrediensProtein, enhet);
+            }
             else
             {
                 //Om man skriver en ingrediens som inte finns 
@@ -168,7 +236,7 @@ namespace MatProgram
             protein += _protein;
 
             //Skriver ut ingrediensens innehåll
-            Console.WriteLine($"{enhet}g {ingrediens} innehåller {_kcal}kcal, {_fett}g mättat fett och {_protein}g protein.");
+            Console.WriteLine($"{enhet}g {ingrediens} innehåller {(int)_kcal}kcal, {(int)_fett}g mättat fett och {(int)_protein}g protein.");
         }
     }
 }
