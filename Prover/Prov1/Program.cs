@@ -10,7 +10,7 @@ namespace Prov1
             //Berätta vad programmet gör
             Console.WriteLine("Uträckning av nettolön\n-----------------");
 
-
+            string köraIgen = "j";
             while (köraIgen=="j") {
                 //Fråga efter namn
                 Console.Write("Vad heter du? ");
@@ -45,7 +45,7 @@ namespace Prov1
                 }
 
                 Console.Write("Vill du köra igen? (j/n) ");
-                string köraIgen = Console.ReadLine();
+                köraIgen = Console.ReadLine();
             }
         }
     }
