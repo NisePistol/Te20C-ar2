@@ -28,7 +28,7 @@ namespace MatProgram
                 i += IngrediensLista();
             }
 
-            Console.WriteLine($"Hela din maträtt innehåller {(int)kcal}kcal, {(int)fett}g mättat fett och {(int)protein}g protein.");
+            Console.WriteLine($"Hela din maträtt innehåller {(int)kcal}kcal, {(int)fett}g mättat fett och {(int )protein}g protein.");
         }
 
         static int IngrediensLista()

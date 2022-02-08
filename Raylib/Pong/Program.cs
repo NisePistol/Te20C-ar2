@@ -29,19 +29,19 @@ namespace Pong
         static int mouseX;
         static int mouseY;
 
-        static int scen = 0;
+        static int scen = 2;
 
         static bool flag = true;
 
         static Random generator = new Random();
-
-        static float sek = 3;
 
         static string name1;
         static string name2;
         static Color nameColor = Color.BLUE;
         static int nameX = screenWidth / 2 - 25;
         static int nameSize = 75;
+
+        static bool overlay = true;
 
         static void Main(string[] args)
         {
@@ -59,34 +59,61 @@ namespace Pong
                 //Sätter bakgrunden
                 Raylib.ClearBackground(Color.BEIGE);
 
-                //Kör endast "StartScreen" en gång
+                //Kör start scenen
                 if (scen == 0)
                 {
                     StartScreen();
                 }
 
+                //Kör namn scenen
                 if (scen == 1)
                 {
                     NameScreen();
                 }
 
-                //Vätar på return värdet för att börja rita spelet
+                //Kör själva spelet
                 if (scen == 2)
                 {
 
+                    if (overlay)
+                    {
+                        Raylib.DrawRectangle(0, 0, screenWidth, screenHeight, Color.LIGHTGRAY);
+                        Raylib.DrawText("W", 175, 500, 50, Color.BLACK);
+                        Raylib.DrawText("S", 275, 500, 50, Color.BLACK);
+                        Raylib.DrawText("UP", 875, 500, 50, Color.BLACK);
+                        Raylib.DrawText("Down", 1000, 500, 50, Color.BLACK);
+
+                        Raylib.DrawRectangleLines(162, 490, 62, 62, Color.BLACK);
+                        Raylib.DrawRectangleLines(260, 490, 62, 62, Color.BLACK);
+                        Raylib.DrawRectangleLines(862, 490, 88, 62, Color.BLACK);
+                        Raylib.DrawRectangleLines(987, 490, 150, 62, Color.BLACK);
+                        if (Raylib.IsKeyDown(KeyboardKey.KEY_SPACE))
+                        {
+                            overlay = false;
+                        }
+                    }
+                    else
+                    {
+                        //Kollar efter input för spelaren och flyttar på spelaren
+                        Player.PlayerController();
+
+                        //Flyttar på bollen
+                        MoveBall();
+                    }
+
+                    //Om ingen har vunnit så ritas spelarna
                     if (blueScore < 5 && redScore < 5)
                     {
                         Player.DrawPlayer();
                     }
 
+                    //Ritar user interface
                     DrawUI();
 
-                    MoveBall();
+                    //Kollar om bollen nuddar nån av spelarna
+                    BallPlayerCollision(Player.player1PosX, Player.player1PosY, Player.player2PosX, Player.player2PosY, Player.playerW, Player.playerH);
 
-                    Player.PlayerController();
-
-                    BallPlayerCollision(Player.recPosX, Player.recPosY, Player.rec2PosX, Player.rec2PosY, Player.recW, Player.recH);
-
+                    //Kör slut scenen
                     if (blueScore >= 5 || redScore >= 5)
                     {
                         EndScreen();
@@ -101,8 +128,6 @@ namespace Pong
         static void NameScreen()
         {
             Raylib.DrawText("ENTER NAME", screenWidth / 3 - 50, 20, 75, Color.RAYWHITE);
-            Raylib.DrawText($" {sek} ", screenWidth / 2, 300, 75, Color.RAYWHITE);
-
             //Om spelare 1 väljer namn
             if (flag)
             {
@@ -144,7 +169,7 @@ namespace Pong
 
                 //Ändrar färgen
                 nameColor = Color.RED;
-                
+
                 //Återställer name positionen
                 nameX = screenWidth / 2 - 20;
             }
@@ -284,18 +309,7 @@ namespace Pong
 
         static void DrawBackground()
         {
-            /* int[] ballMidPointsX = new int[10];
-            int[] ballMidPointsY = new int[10];
-            if (flag < 1)
-            {
-                for (var i = 0; i < ballMidPointsX.Length; i++)
-                {
-                    ballMidPointsX[i] = generator.Next(10, screenWidth - 10);
-                    ballMidPointsY[i] = generator.Next(10, screenHeight - 10);
-                    Raylib.DrawCircle(ballMidPointsX[0], ballMidPointsY[0], 10, Color.BROWN);
-                }
-            }
-            flag++; */
+
         }
 
         static void MoveBall()
@@ -324,7 +338,7 @@ namespace Pong
 
                 //Rita bollen
                 Raylib.DrawCircle(ballPosX, ballPosY, ballRad, Color.BROWN);
-                Raylib.DrawRectangle(ballPosX, ballPosY, ballRad*2, ballRad*2, Color.BROWN);
+                Raylib.DrawRectangle(ballPosX, ballPosY, ballRad * 2, ballRad * 2, Color.BROWN);
             }
             else
             {
@@ -390,26 +404,7 @@ namespace Pong
             //Om man trycker på "JA" knappen, enter eller space
             if (mouseX > buttonX && mouseX < buttonX + buttonW && mouseY > buttonY && mouseY < buttonY + buttonH && Raylib.IsMouseButtonPressed(MouseButton.MOUSE_LEFT_BUTTON) || Raylib.IsKeyDown(KeyboardKey.KEY_SPACE) || Raylib.IsKeyDown(KeyboardKey.KEY_ENTER))
             {
-                //Återställer bådas poäng
-                blueScore = 0;
-                redScore = 0;
-
-                //Återställer bollens hastighet
-                ballSpeedX = 6;
-                ballSpeedY = 6;
-
-                //Återställer spelarna
-                Player.ResetPlayers();
-
-                //Återställer spelarnas namn
-                name1 = "";
-                name2 = "";
-
-                //Sätter tillbaka flag till true så att spelare 1 får välja namn först
-                flag = true;
-
-                //Sätter på första scenen
-                scen = 0;
+                ResetVariables();
             }
 
             //Ritar knappen
@@ -418,6 +413,33 @@ namespace Pong
             Raylib.DrawRectangleLines(buttonX, buttonY, buttonW, buttonH, Color.BLACK);
             //Ritar texten innuti
             Raylib.DrawText("JA", txtX, txtY, txtSize, Color.BLACK);
+        }
+
+        static void ResetVariables()
+        {
+            //Återställer bådas poäng
+            blueScore = 0;
+            redScore = 0;
+
+            //Återställer bollens hastighet
+            ballSpeedX = 6;
+            ballSpeedY = 6;
+
+            //Återställer spelarna
+            Player.ResetPlayers();
+
+            //Återställer spelarnas namn
+            name1 = "";
+            name2 = "";
+
+            //Sätter tillbaka flag till true så att spelare 1 får välja namn först
+            flag = true;
+
+            //Sätter på första scenen
+            scen = 0;
+
+            //Återställer namn färgen
+            nameColor = Color.BLUE;
         }
 
         static void AnimateText()
@@ -585,18 +607,18 @@ namespace Pong
         static int screenWidth = 1200;
         static int screenHeight = 600;
 
-        public static int recW = 20;
-        public static int recH = 100;
+        public static int playerW = 20;
+        public static int playerH = 100;
 
-        static int recStartPosX = (screenWidth / 5) - 2;
-        static int recStartPosY = screenHeight / 2 - (recH / 2);
-        public static int recPosX = recStartPosX;
-        public static int recPosY = recStartPosY;
+        static int player1StartPosX = (screenWidth / 5) - 2;
+        static int player1StartPosY = screenHeight / 2 - (playerH / 2);
+        public static int player1PosX = player1StartPosX;
+        public static int player1PosY = player1StartPosY;
 
-        static int rec2StartPosX = (screenWidth - screenWidth / 5) + 1;
-        static int rec2StartPosY = recPosY;
-        public static int rec2PosX = rec2StartPosX;
-        public static int rec2PosY = rec2StartPosY;
+        static int player2StartPosX = (screenWidth - screenWidth / 5) + 1;
+        static int player2StartPosY = player1PosY;
+        public static int player2PosX = player2StartPosX;
+        public static int player2PosY = player2StartPosY;
 
         public static void PlayerController()
         {
@@ -604,56 +626,58 @@ namespace Pong
             //KONTROLL FÖR SPELARE 1
             if (Raylib.IsKeyDown(KeyboardKey.KEY_W))
             {
-                recPosY -= recSpeed;
+                player1PosY -= recSpeed;
             }
             else if (Raylib.IsKeyDown(KeyboardKey.KEY_S))
             {
-                recPosY += recSpeed;
+                player1PosY += recSpeed;
             }
             //KONTROLL FÖR SPELARE 2
             if (Raylib.IsKeyDown(KeyboardKey.KEY_UP))
             {
-                rec2PosY -= recSpeed;
+                player2PosY -= recSpeed;
             }
             else if (Raylib.IsKeyDown(KeyboardKey.KEY_DOWN))
             {
-                rec2PosY += recSpeed;
+                player2PosY += recSpeed;
             }
 
             //Kollision med kanter för rektangel
-            if (recPosY + recH >= screenHeight)
+            if (player1PosY + playerH >= screenHeight)
             {
-                recPosY = screenHeight - recH;
+                player1PosY = screenHeight - playerH;
             }
-            else if (recPosY <= 0)
+            else if (player1PosY <= 0)
             {
-                recPosY = 0;
+                player1PosY = 0;
             }
             //Kollision med kanter för rektangel
-            if (rec2PosY + recH >= screenHeight)
+            if (player2PosY + playerH >= screenHeight)
             {
-                rec2PosY = screenHeight - recH;
+                player2PosY = screenHeight - playerH;
             }
-            else if (rec2PosY <= 0)
+            else if (player2PosY <= 0)
             {
-                rec2PosY = 0;
+                player2PosY = 0;
             }
         }
 
         public static void DrawPlayer()
         {
             //Rita spelarna
-            Raylib.DrawRectangle(recPosX, recPosY, recW, recH, Color.BLUE);
-            Raylib.DrawRectangle(rec2PosX, rec2PosY, recW, recH, Color.RED);
+            Raylib.DrawRectangle(player1PosX, player1PosY, playerW, playerH, Color.BLUE);
+            Raylib.DrawRectangle(player2PosX, player2PosY, playerW, playerH, Color.RED);
         }
 
         public static void ResetPlayers()
         {
-            recPosX = recStartPosX;
-            recPosY = recStartPosY;
+            //Återställer spelare 1s position
+            player1PosX = player1StartPosX;
+            player1PosY = player1StartPosY;
 
-            rec2PosX = rec2StartPosX;
-            rec2PosY = rec2StartPosY;
+            //Återställer spelare 1s position
+            player2PosX = player2StartPosX;
+            player2PosY = player2StartPosY;
         }
     }
 }
