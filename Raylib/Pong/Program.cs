@@ -29,7 +29,7 @@ namespace Pong
         static int mouseX;
         static int mouseY;
 
-        static int scen = 2;
+        static int scen = 0;
 
         static bool flag = true;
 
