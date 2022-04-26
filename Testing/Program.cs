@@ -56,7 +56,6 @@ namespace Testing
             if (frågorLista.Count < 1)
             {
                 Console.WriteLine("Slut på frågor");
-                valdFråga = "";
             }
             else
             {
