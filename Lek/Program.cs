@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Lek
 {
@@ -58,10 +60,9 @@ namespace Lek
             Random gen = new Random();
             int siffraAttGissa = gen.Next(räckvidd[0], räckvidd[1]);
             int antalGissningar = 5;
-            int gissning = siffraAttGissa+1;
+            int gissning = siffraAttGissa + 1;
 
             Console.WriteLine($"\nDatorn har valt ett tal mellan {räckvidd[0]}-{räckvidd[1]}");
-            Console.WriteLine(siffraAttGissa);
 
             while (antalGissningar > 0)
             {
@@ -82,9 +83,9 @@ namespace Lek
                     Console.WriteLine("\nDu gissade för lågt!");
                     MinskaAntalGissningar(ref antalGissningar);
                 }
-                
-                int tur = gen.Next(3);
-                if (tur == 2 || antalGissningar == 0)
+
+                int tur = 2;
+                if (tur == 2)
                 {
                     VinnEnExtraGissning(ref antalGissningar);
                 }
@@ -96,7 +97,7 @@ namespace Lek
             antalGissningar -= 1;
             if (antalGissningar > 0)
             {
-                Console.WriteLine($"Du har {antalGissningar} gissningar kvar"); 
+                Console.WriteLine($"Du har {antalGissningar} gissningar kvar");
             }
             else
             {
@@ -107,15 +108,18 @@ namespace Lek
         public static void VinnEnExtraGissning(ref int antalGissningar)
         {
             Console.BackgroundColor = ConsoleColor.Blue;
-            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("DU HAR CHANSEN ATT VINNA EN GRATIS GISSNING!!!");
             Console.WriteLine("Om du svarar rätt på denna fråga får du en extra gissning!\n");
 
-            int gissning = KollaInt("Vad är roten ur 49? ");
-            if(gissning == 7)
+            //Ställer en fråga och tar in en gissning från användaren
+            Console.WriteLine(SlumpaFråga()[0]);
+            Console.WriteLine(SlumpaFråga()[1]);
+            string gissning = Console.ReadLine().ToLower();
+
+            if (gissning == SlumpaFråga()[1])
             {
                 Console.WriteLine("Du gissade rätt!");
-                antalGissningar+=1;
+                antalGissningar += 1;
                 Console.WriteLine($"Antal gissningar: {antalGissningar}\n");
             }
             else
@@ -127,11 +131,63 @@ namespace Lek
             Console.ForegroundColor = ConsoleColor.White;
         }
 
+        public static string[] SlumpaFråga()
+        {
+            Random generator = new Random();
+            string[] frågaOchSvar = new string[2];
+
+            //Skapar listan med frågor
+            List<string> frågor = new List<string>();
+
+            //Lägger till frågor
+            //Varje fråga har sitt respektive svar efter ' ; ' täcknet
+            frågor.Add("Vad är roten ur 49?;7");
+            frågor.Add("Vad heter Zlatan i efternamn?;ibrahimovic");
+
+            //Generar en slumpval index
+            int slumpIndex = generator.Next(frågor.Count);
+
+            //Slumpar fråga med hjälp av den slumpade indexen
+            frågaOchSvar[0] = frågor[slumpIndex].Split(';')[0];
+
+            //Lägger in frågans respektive svar i arrayen
+            frågaOchSvar[1] = frågor[slumpIndex].Split(';')[1];
+
+            //Tar bort den valda frågan från listan så att den inte kan väljas igen
+            frågor.Remove(frågor[slumpIndex]);
+
+            //Returnerar den valda frågan
+            return frågaOchSvar;
+        }
+
         public static void FelMeddelande(string meddelande)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(meddelande);
             Console.ForegroundColor = ConsoleColor.White;
+        }
+    }
+
+    class Frågor
+    {
+        List<string> frågor = new List<string>();
+        Random generator = new Random();
+        static string valdFråga;
+
+        public Frågor()
+        {
+            //Lägger till frågor
+            //Varje fråga har sitt respektive svar efter ' ; ' täcknet
+            frågor.Add("Vad är roten ur 49?;7");
+            frågor.Add("Vad heter Zlatan i efternamn?;ibrahimovic");
+            valdFråga = frågor[generator.Next(frågor.Count)].Split(';')[0];
+        }
+
+        public string SkrivUtFråga()
+        {  
+            //Ställer frågan och returnerar användarens gissning
+            Console.WriteLine(valdFråga);
+            return Console.ReadLine();
         }
     }
 }
