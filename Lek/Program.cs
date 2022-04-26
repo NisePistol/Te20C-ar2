@@ -10,8 +10,14 @@ namespace Lek
         {
             Console.Clear();
             Console.WriteLine("Gissa siffran spel\n-----------------");
+            
+            //Skapar alla special frågor
+            Frågor.SkapaFrågor();
 
+            //Låter spelaren välja räckvidd att gissa på
             int[] räckvidd = VäljRäckvidd();
+
+            //Låter spelaren gissa siffra
             GissaSiffra(räckvidd);
         }
 
@@ -58,8 +64,9 @@ namespace Lek
         public static void GissaSiffra(int[] räckvidd)
         {
             Random gen = new Random();
-            int siffraAttGissa = gen.Next(räckvidd[0], räckvidd[1]);
             int antalGissningar = 5;
+
+            int siffraAttGissa = gen.Next(räckvidd[0], räckvidd[1]);
             int gissning = siffraAttGissa + 1;
 
             Console.WriteLine($"\nDatorn har valt ett tal mellan {räckvidd[0]}-{räckvidd[1]}");
@@ -108,19 +115,20 @@ namespace Lek
         public static void VinnEnExtraGissning(ref int antalGissningar)
         {
             Console.BackgroundColor = ConsoleColor.Blue;
-            Console.WriteLine("DU HAR CHANSEN ATT VINNA EN GRATIS GISSNING!!!");
+            Console.WriteLine("\nDU HAR CHANSEN ATT VINNA EN GRATIS GISSNING!!!");
             Console.WriteLine("Om du svarar rätt på denna fråga får du en extra gissning!\n");
 
             //Ställer en fråga och tar in en gissning från användaren
-            Console.WriteLine(SlumpaFråga()[0]);
-            Console.WriteLine(SlumpaFråga()[1]);
-            string gissning = Console.ReadLine().ToLower();
+            string gissning = Frågor.StällFråga().ToLower();
 
-            if (gissning == SlumpaFråga()[1])
+            if (gissning == Frågor.rättSvar)
             {
                 Console.WriteLine("Du gissade rätt!");
                 antalGissningar += 1;
                 Console.WriteLine($"Antal gissningar: {antalGissningar}\n");
+
+                //Tar bort frågan från listan
+                Frågor.TaBortFråga();
             }
             else
             {
@@ -131,34 +139,6 @@ namespace Lek
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        public static string[] SlumpaFråga()
-        {
-            Random generator = new Random();
-            string[] frågaOchSvar = new string[2];
-
-            //Skapar listan med frågor
-            List<string> frågor = new List<string>();
-
-            //Lägger till frågor
-            //Varje fråga har sitt respektive svar efter ' ; ' täcknet
-            frågor.Add("Vad är roten ur 49?;7");
-            frågor.Add("Vad heter Zlatan i efternamn?;ibrahimovic");
-
-            //Generar en slumpval index
-            int slumpIndex = generator.Next(frågor.Count);
-
-            //Slumpar fråga med hjälp av den slumpade indexen
-            frågaOchSvar[0] = frågor[slumpIndex].Split(';')[0];
-
-            //Lägger in frågans respektive svar i arrayen
-            frågaOchSvar[1] = frågor[slumpIndex].Split(';')[1];
-
-            //Tar bort den valda frågan från listan så att den inte kan väljas igen
-            frågor.Remove(frågor[slumpIndex]);
-
-            //Returnerar den valda frågan
-            return frågaOchSvar;
-        }
 
         public static void FelMeddelande(string meddelande)
         {
@@ -170,24 +150,68 @@ namespace Lek
 
     class Frågor
     {
-        List<string> frågor = new List<string>();
-        Random generator = new Random();
+        static List<string> frågorLista = new List<string>();
         static string valdFråga;
+        public static string rättSvar;
+        static int slumpIndex;
 
-        public Frågor()
+        public static void SlumpaFråga()
+        {
+            Random generator = new Random();
+
+            //Skapar slump index
+            slumpIndex = generator.Next(frågorLista.Count);
+
+            //Om det är slut på frågor
+            if (frågorLista.Count < 1)
+            {
+                Console.WriteLine("Slut på frågor");
+            }
+            else
+            {
+                //Deklarerar den valda frågan och dett rätta svaret
+                valdFråga = frågorLista[slumpIndex].Split(';')[0];
+                rättSvar = frågorLista[slumpIndex].Split(';')[1];
+            }
+        }
+
+        public static void TaBortFråga()
+        {
+            //Tar bort frågan från listan
+            frågorLista.RemoveAt(slumpIndex);
+        }
+
+
+        public static void SkapaFrågor()
         {
             //Lägger till frågor
             //Varje fråga har sitt respektive svar efter ' ; ' täcknet
-            frågor.Add("Vad är roten ur 49?;7");
-            frågor.Add("Vad heter Zlatan i efternamn?;ibrahimovic");
-            valdFråga = frågor[generator.Next(frågor.Count)].Split(';')[0];
+            frågorLista.Add("Vad är roten ur 49?;7");
+            frågorLista.Add("Vad heter Zlatan i efternamn?;ibrahimovic");
+            frågorLista.Add("Vad heter 16 upphöjt till 0?;1");
+            frågorLista.Add("Vilket år dog hitler?;1945");
+            frågorLista.Add("Vad heter kaninen i Bamse?;lille skutt");
+            frågorLista.Add("Vilket år skapades programmerings språket \"C#\";2000");
         }
 
-        public string SkrivUtFråga()
-        {  
-            //Ställer frågan och returnerar användarens gissning
-            Console.WriteLine(valdFråga);
-            return Console.ReadLine();
+        public static string StällFråga()
+        {
+            //Slumpar fram en fråga
+            SlumpaFråga();
+
+            string gissning = "";
+            //Om det finns frågor i listan
+            if(frågorLista.Count > 0)
+            {
+                //Skriver ut frågan
+                Console.WriteLine(valdFråga);
+
+                //Tar in en gissning
+                gissning = Console.ReadLine();
+            }
+
+            return gissning;
         }
     }
 }
+
