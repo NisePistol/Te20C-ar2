@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Lek
 {
@@ -10,36 +9,72 @@ namespace Lek
         {
             Console.Clear();
             Console.WriteLine("Gissa siffran spel\n-----------------");
-            
-            //Skapar alla special frågor
-            Frågor.SkapaFrågor();
 
-            //Låter spelaren välja räckvidd att gissa på
-            int[] räckvidd = VäljRäckvidd();
+            string spelaIgen = "j";
+            while (spelaIgen == "j")
+            {
+                //Skapar alla special frågor
+                Frågor.SkapaFrågor();
 
-            //Låter spelaren gissa siffra
-            GissaSiffra(räckvidd);
+                //Låter spelaren välja svårighetsgrad
+                int[] räckvidd = VäljSvårighetsGrad();
+
+                //Låter spelaren gissa siffra
+                GissaSiffra(räckvidd);
+
+                Console.WriteLine("Vill du spela igen? (j/n)");
+                spelaIgen = Console.ReadLine().ToLower();
+            }
         }
 
-        public static int[] VäljRäckvidd()
-        {
-            int högstaSiffran = 0;
-            int lägstaSiffran = 1;
-            Console.WriteLine("Du får själv välja räckvidden på siffror man kan gissa");
+        public static int[] VäljRäckvidd(string svårighetsgrad)
+        {   
+            int[] räckvidd = new int[2];
 
-            while (lägstaSiffran > högstaSiffran)
-            {
-                högstaSiffran = KollaInt("Vad är högstsa siffran man ska gissa? ");
-
-                lägstaSiffran = KollaInt("Vad är minsta siffran man ska gissa? ");
-
-                if (lägstaSiffran > högstaSiffran)
+            if (svårighetsgrad == "enkelt")
                 {
-                    FelMeddelande("Den högsta siffran är mindre än den minsta siffran\n");
+                    //Räckvidden är 1-10
+                    räckvidd = BestämRäckvidd(1, 10);
                 }
+                else if (svårighetsgrad == "medel")
+                {
+                    //Räckvidden är 1-50
+                    räckvidd = BestämRäckvidd(1, 50);
+                }
+                else if (svårighetsgrad == "svår")
+                {
+                    //Räckvidden är 1-100
+                    räckvidd = BestämRäckvidd(1, 100);
+                }
+                else
+                {
+                    FelMeddelande("Du måste svara \"Enkelt\", \"medel\" eller \"svår\"");
+                    räckvidd[0] = -1;
+                }
+
+
+            return räckvidd;
+        }
+
+        public static int[] BestämRäckvidd(int minTal, int maxTal)
+        {
+            int[] räckvidd = {minTal, maxTal};
+            return räckvidd;
+        }
+
+        public static int[] VäljSvårighetsGrad()
+        {
+            int[] räckvidd = {-1, 0};
+            while (räckvidd[0] == -1)
+            {
+                Console.WriteLine("-----Välj svårighetsgrad-----");
+                Console.WriteLine("Enkelt/Medel/Svår");
+
+                //Tar in svårighetsgraden och bestämmer räckvidden
+                //Om användaren ger felaktigt input så kommer räckvidd[0] = -1 och whilen kommer loopa
+                räckvidd = VäljRäckvidd(Console.ReadLine().ToLower());
             }
 
-            int[] räckvidd = { lägstaSiffran, högstaSiffran };
             return räckvidd;
         }
 
@@ -64,10 +99,9 @@ namespace Lek
         public static void GissaSiffra(int[] räckvidd)
         {
             Random gen = new Random();
-            int antalGissningar = 5;
-
-            int siffraAttGissa = gen.Next(räckvidd[0], räckvidd[1]);
+            int siffraAttGissa = gen.Next(räckvidd[0], räckvidd[1] + 1);
             int gissning = siffraAttGissa + 1;
+            int antalGissningar = 5;
 
             Console.WriteLine($"\nDatorn har valt ett tal mellan {räckvidd[0]}-{räckvidd[1]}");
 
@@ -82,26 +116,36 @@ namespace Lek
                 }
                 else if (gissning > siffraAttGissa)
                 {
-                    Console.WriteLine("\nDu gissade för högt!");
-                    MinskaAntalGissningar(ref antalGissningar);
+                    GissningsResultat("\nDu gissade för högt", ref antalGissningar);
                 }
                 else
                 {
-                    Console.WriteLine("\nDu gissade för lågt!");
-                    MinskaAntalGissningar(ref antalGissningar);
+                    GissningsResultat("\nDu gissade för lågt", ref antalGissningar);
                 }
 
-                int tur = 2;
+                int tur = gen.Next(4);
                 if (tur == 2)
                 {
                     VinnEnExtraGissning(ref antalGissningar);
                 }
+
+                AntalGissningarKvar(antalGissningar);
             }
+
+            Console.WriteLine($"Det rätta svaret var {siffraAttGissa}");
         }
 
-        public static void MinskaAntalGissningar(ref int antalGissningar)
+        public static void GissningsResultat(string meddelande, ref int antalGissningar)
         {
+            //Skriver ut meddelandet
+            Console.WriteLine(meddelande);
+
             antalGissningar -= 1;
+
+        }
+
+        public static void AntalGissningarKvar(int antalGissningar)
+        {
             if (antalGissningar > 0)
             {
                 Console.WriteLine($"Du har {antalGissningar} gissningar kvar");
@@ -192,6 +236,8 @@ namespace Lek
             frågorLista.Add("Vilket år dog hitler?;1945");
             frågorLista.Add("Vad heter kaninen i Bamse?;lille skutt");
             frågorLista.Add("Vilket år skapades programmerings språket \"C#\";2000");
+
+
         }
 
         public static string StällFråga()
@@ -201,7 +247,7 @@ namespace Lek
 
             string gissning = "";
             //Om det finns frågor i listan
-            if(frågorLista.Count > 0)
+            if (frågorLista.Count > 0)
             {
                 //Skriver ut frågan
                 Console.WriteLine(valdFråga);
