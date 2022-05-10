@@ -13,22 +13,26 @@ namespace Testing
             int points = 0;
 
             //Kör en for-loop 5 gånger för att ställa 5 frågor
-            for (var i = 0; i < 10; i++)
+            for (var i = 0; i < 3; i++)
             {
-                //Slumpar en fråga
-                Frågor.SlumpaFråga();
+                //Skapar en ny fråga
+                Frågor fråga = new Frågor();
 
                 //Ställer frågan och tar in en gissning från användaren
-                string gissning = Frågor.StällFråga();
+                string gissning = fråga.StällFråga();
 
                 //Om användaren gissar rätt
-                if (gissning == Frågor.rättSvar)
+                if (gissning == fråga.rättSvar)
                 {
                     //Får ett poäng
                     points++;
 
                     //Tar bort frågan ur listan
-                    Frågor.TaBortFråga();
+                    fråga.TaBortFråga();
+                }
+                else
+                {
+                    i--;
                 }
 
                 //Skriver ut användarens poäng
@@ -41,31 +45,25 @@ namespace Testing
     {
         static List<string> frågorLista = new List<string>();
         static string valdFråga;
-        public static string rättSvar;
         static int slumpIndex;
+        public string rättSvar;
 
-        public static void SlumpaFråga()
+        public Frågor()
         {
-            Random generator = new Random();
-
-            //Skapar slump index
-            slumpIndex = generator.Next(frågorLista.Count);
-            Console.WriteLine($"Det finns {frågorLista.Count} frågor i listan");
-
-            //Om det är slut på frågor
+            Random gen = new Random();
+            slumpIndex = gen.Next(frågorLista.Count);
             if (frågorLista.Count < 1)
             {
                 Console.WriteLine("Slut på frågor");
             }
             else
             {
-                //Deklarerar den valda frågan och dett rätta svaret
                 valdFråga = frågorLista[slumpIndex].Split(';')[0];
                 rättSvar = frågorLista[slumpIndex].Split(';')[1];
             }
         }
 
-        public static void TaBortFråga()
+        public void TaBortFråga()
         {
             //Tar bort frågan från listan
             frågorLista.RemoveAt(slumpIndex);
@@ -81,12 +79,12 @@ namespace Testing
             frågorLista.Add("Vad heter 16 upphöjt till 0?;1");
         }
 
-        public static string StällFråga()
+        public string StällFråga()
         {
             string gissning = "";
 
             //Om det finns frågor i listan
-            if(frågorLista.Count > 0)
+            if (frågorLista.Count > 0)
             {
                 //Skriver ut frågan
                 Console.WriteLine(valdFråga);

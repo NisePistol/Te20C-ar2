@@ -5,6 +5,8 @@ namespace Lek
 {
     class Program
     {
+        static int chans;
+
         static void Main(string[] args)
         {
             Console.Clear();
@@ -16,6 +18,7 @@ namespace Lek
             string spelaIgen = "j";
             while (spelaIgen == "j")
             {
+                chans = 4;
                 //Låter spelaren välja svårighetsgrad
                 int[] räckvidd = VäljSvårighetsGrad();
 
@@ -27,10 +30,28 @@ namespace Lek
             }
         }
 
+        public static int[] VäljSvårighetsGrad()
+        {
+            int[] räckvidd = { -1, 0 };
+            while (räckvidd[0] == -1)
+            {
+                Console.Clear();
+                Console.WriteLine("-----Välj svårighetsgrad-----");
+                Console.WriteLine("Enkelt/Medel/Svår");
+
+                //Tar in svårighetsgraden och bestämmer räckvidden
+                //Om användaren ger felaktigt input så kommer räckvidd[0] = -1 och användaren kommer få skriva igen
+                string svårighetsgrad = Console.ReadLine().ToLower();
+                räckvidd = VäljRäckvidd(svårighetsgrad);
+            }
+
+            return räckvidd;
+        }
+
         public static int[] VäljRäckvidd(string svårighetsgrad)
         {
             int[] räckvidd = new int[2];
-            
+
             if (svårighetsgrad == "enkelt")
             {
                 //Räckvidden är 1-10
@@ -56,27 +77,143 @@ namespace Lek
             return räckvidd;
         }
 
+        /// <summary>
+        /// Returnerar räckvidden i en array (Denna metod är för att göra koden snyggare)
+        /// </summary>
+        /// <param name="minTal"></param>
+        /// <param name="maxTal"></param>
+        /// <returns></returns>
         public static int[] BestämRäckvidd(int minTal, int maxTal)
         {
             int[] räckvidd = { minTal, maxTal };
             return räckvidd;
         }
 
-        public static int[] VäljSvårighetsGrad()
+        public static void GissaSiffra(int[] räckvidd)
         {
-            int[] räckvidd = { -1, 0 };
-            while (räckvidd[0] == -1)
-            {
-                Console.Clear();
-                Console.WriteLine("-----Välj svårighetsgrad-----");
-                Console.WriteLine("Enkelt/Medel/Svår");
+            Random gen = new Random();
+            bool användarenVann = false;
 
-                //Tar in svårighetsgraden och bestämmer räckvidden
-                //Om användaren ger felaktigt input så kommer räckvidd[0] = -1 och koden kommer loopa
-                räckvidd = VäljRäckvidd(Console.ReadLine().ToLower());
+            //Antal gissningar användaren får
+            int antalGissningar = 5;
+
+            //Slumpar en siffra inom räckvidden som användaren ska gissa
+            int siffraAttGissa = gen.Next(räckvidd[0], räckvidd[1] + 1);
+
+            //Variabeln "gissning" måste ha ett värde för att kunna användas senare i koden
+            int gissning = siffraAttGissa + 1;
+
+            Console.WriteLine($"\nDatorn har valt ett tal mellan {räckvidd[0]}-{räckvidd[1]}");
+            Console.WriteLine($"Du börjar med {antalGissningar} gissningar");
+
+            while (antalGissningar > 0)
+            {
+                //Tar in en gissning från användaren och kollar om det är en int
+                gissning = KollaInt("Gissa en siffra: ");
+
+                //Om användaren gissade rätt
+                if (gissning == siffraAttGissa)
+                {
+                    Console.WriteLine("Du gissade rätt!\n");
+                    användarenVann = true;
+                    break;
+                }
+                //Om användaren gissade för högt
+                else if (gissning > siffraAttGissa)
+                {
+                    //Skriver ut resultatet och minskar antal gissningar
+                    GissningsResultat("Du gissade för högt\n", ref antalGissningar);
+                }
+                //Annars = om användaren gissade för lågt
+                else
+                {
+                    //Skriver ut resultatet och minskar antal gissningar
+                    GissningsResultat("Du gissade för lågt\n", ref antalGissningar);
+                }
+
+                //Slumpar en siffra
+                int tur = gen.Next(chans);
+                Console.WriteLine($"Chans = {chans}");
+
+                //Om siffran är 0 så får man en chans att vinna en extra gissning
+                if (tur == 0)
+                {
+                    VinnEnExtraGissning(ref antalGissningar);
+                }
+
+                //Om siffran inte blir 0 så blir chansen för det större nästa runda
+                else if (chans > 0)
+                {
+                    chans--;
+                }
+                
+                //Skriver ut hur många gissningar användaren har kvar
+                AntalGissningarKvar(antalGissningar);
             }
 
-            return räckvidd;
+            //Om man förlorar skrivs den rätt siffran ut
+            if (!användarenVann)
+            {
+                Console.WriteLine($"Det rätta svaret var {siffraAttGissa}");
+            }
+        }
+
+        public static void GissningsResultat(string meddelande, ref int antalGissningar)
+        {
+            //Skriver ut meddelandet
+            Console.WriteLine(meddelande);
+
+            //Minskar antal gissningar
+            antalGissningar -= 1;
+        }
+
+        /// <summary>
+        /// Metoden skriver ut antal gissningar eller att användaren har slut på gissningar om hen har det
+        /// </summary>
+        /// <param name="antalGissningar"></param>
+        public static void AntalGissningarKvar(int antalGissningar)
+        {
+            //Om man har över 0 gissningar så skrivs antal gissningar ut
+            if (antalGissningar > 0)
+            {
+                Console.WriteLine($"Du har {antalGissningar} gissningar kvar");
+            }
+
+            //Annars skrivs det ut att man har slut på gissningar
+            else
+            {
+                Console.WriteLine("Du har slut på gissningar");
+            }
+        }
+
+        public static void VinnEnExtraGissning(ref int antalGissningar)
+        {
+            //Ändrar textfärgen
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("\nDU HAR CHANSEN ATT VINNA EN GRATIS GISSNING!!!");
+            Console.WriteLine("Om du svarar rätt på denna fråga får du en extra gissning!\n");
+
+            //Ställer en fråga och tar in en gissning från användaren
+            string gissning = Frågor.StällFråga().ToLower();
+
+            //Om användaren gissade rätt
+            if (gissning == Frågor.rättSvar)
+            {
+                //Ger användaren en till gissning
+                Console.WriteLine("Du gissade rätt!");
+                antalGissningar += 1;
+                Console.WriteLine($"Antal gissningar: +1\n");
+
+                //Tar bort frågan från listan
+                Frågor.TaBortFråga();
+            }
+            else
+            {
+                Console.WriteLine("Du gissade fel!\n");
+            }
+
+            //Ändrar tillbaka textfärgen
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
         public static int KollaInt(string fråga)
@@ -100,108 +237,9 @@ namespace Lek
             }
         }
 
-        public static void GissaSiffra(int[] räckvidd)
-        {
-            Random gen = new Random();
-            int siffraAttGissa = gen.Next(räckvidd[0], räckvidd[1] + 1);
-            int gissning = siffraAttGissa + 1;
-            int antalGissningar = 5;
-            bool användarenVann = false;
-
-            Console.WriteLine($"\nDatorn har valt ett tal mellan {räckvidd[0]}-{räckvidd[1]}");
-            Console.WriteLine($"Du börjar med {antalGissningar} gissningar");
-
-            while (antalGissningar > 0)
-            {
-                gissning = KollaInt("Gissa en siffra: ");
-
-                if (gissning == siffraAttGissa)
-                {
-                    Console.WriteLine("Du gissade rätt!\n");
-                    användarenVann = true;
-                    break;
-                }
-                else if (gissning > siffraAttGissa)
-                {
-                    GissningsResultat("Du gissade för högt\n", ref antalGissningar);
-                }
-                else
-                {
-                    GissningsResultat("Du gissade för lågt\n", ref antalGissningar);
-                }
-
-                int tur = gen.Next(3);
-                if (tur == 2)
-                {
-                    if (Frågor.frågorLista.Count > 0)
-                    {
-                        VinnEnExtraGissning(ref antalGissningar);
-                    }
-                    else
-                    {
-                        FelMeddelande("Det finns inga fler special frågor");
-                    }
-                }
-
-                AntalGissningarKvar(antalGissningar);
-            }
-
-            if (!användarenVann)
-            {
-                Console.WriteLine($"Det rätta svaret var {siffraAttGissa}");
-            }
-        }
-
-        public static void GissningsResultat(string meddelande, ref int antalGissningar)
-        {
-            //Skriver ut meddelandet
-            Console.WriteLine(meddelande);
-
-            antalGissningar -= 1;
-        }
-
-        public static void AntalGissningarKvar(int antalGissningar)
-        {
-            if (antalGissningar > 0)
-            {
-                Console.WriteLine($"Du har {antalGissningar} gissningar kvar");
-            }
-            else
-            {
-                Console.WriteLine("Du har slut på gissningar");
-            }
-        }
-
-        public static void VinnEnExtraGissning(ref int antalGissningar)
-        {
-            Console.BackgroundColor = ConsoleColor.Blue;
-            Console.WriteLine("\nDU HAR CHANSEN ATT VINNA EN GRATIS GISSNING!!!");
-            Console.WriteLine("Om du svarar rätt på denna fråga får du en extra gissning!\n");
-
-            //Ställer en fråga och tar in en gissning från användaren
-            string gissning = Frågor.StällFråga().ToLower();
-
-            if (gissning == Frågor.rättSvar)
-            {
-                Console.WriteLine("Du gissade rätt!");
-                antalGissningar += 1;
-                Console.WriteLine($"Antal gissningar: {antalGissningar}\n");
-
-                //Tar bort frågan från listan
-                Frågor.TaBortFråga();
-            }
-            else
-            {
-                Console.WriteLine("Du gissade fel!");
-            }
-
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-
-
         public static void FelMeddelande(string meddelande)
         {
+            //Skrive ut felmeddelandet med röd färg
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(meddelande);
             Console.ForegroundColor = ConsoleColor.White;
@@ -210,12 +248,12 @@ namespace Lek
 
     class Frågor
     {
-        public static List<string> frågorLista = new List<string>();
+        static List<string> frågorLista = new List<string>();
         static string valdFråga;
         public static string rättSvar;
         static int slumpIndex;
 
-        public static void SlumpaFråga()
+        static void SlumpaFråga()
         {
             Random generator = new Random();
 
@@ -258,8 +296,7 @@ namespace Lek
         {
             //Slumpar fram en fråga
             SlumpaFråga();
-            Console.WriteLine($"Antal frågor kvar: {frågorLista.Count}");
-
+            
             string gissning = "";
             //Om det finns frågor i listan
             if (frågorLista.Count > 0)
